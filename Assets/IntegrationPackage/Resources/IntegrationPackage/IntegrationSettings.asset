@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcce2355b60ce654699de6aca8be4e86, type: 3}
+  m_Name: IntegrationSettings
+  m_EditorClassIdentifier: 
+  autoInitialize: 1
+  initializeFirebase: 1
+  initializeAds: 1
+  activeAdNetwork: 0
+  showAppOpen: 1
+  bannerPosition: 0
+  interstitialIntervalSeconds: 40
+  fetchRemoteConfig: 1
+  remoteConfigCacheSeconds: 0
+  remoteUseAdMobKey: IS_ADMOB
+  remoteShowAppOpenKey: IS_SHOW_APP_OPEN
+  remoteInterstitialIntervalKey: INTERVAL_TIME
+  admobBanner:
+    key: Banner
+    androidId: ca-app-pub-3940256099942544/6300978111
+    iosId: ca-app-pub-3940256099942544/2934735716
+    androidRemoteConfigKey: ADMOB_ANDROID_BANNER_ID
+    iosRemoteConfigKey: ADMOB_IOS_BANNER_ID
+  admobAppOpen:
+    key: AppOpen
+    androidId: ca-app-pub-3940256099942544/9257395921
+    iosId: ca-app-pub-3940256099942544/5575463023
+    androidRemoteConfigKey: ADMOB_ANDROID_APP_OPEN_ID
+    iosRemoteConfigKey: ADMOB_IOS_APP_OPEN_ID
+  admobInterstitials:
+  - key: Inter_play_time
+    androidId: ca-app-pub-3940256099942544/1033173712
+    iosId: ca-app-pub-3940256099942544/4411468910
+    androidRemoteConfigKey: ADMOB_ANDROID_INTERTITIAL_ID
+    iosRemoteConfigKey: ADMOB_IOS_INTERTITIAL_ID
+  admobRewarded:
+  - key: Reward_Revive
+    androidId: ca-app-pub-3940256099942544/5224354917
+    iosId: ca-app-pub-3940256099942544/1712485313
+    androidRemoteConfigKey: ADMOB_ANDROID_REWARDED_ID
+    iosRemoteConfigKey: ADMOB_IOS_REWARDED_ID
+  appLovinSdkKey: 
+  appLovinBanner:
+    key: Banner
+    androidId: 
+    iosId: 
+    androidRemoteConfigKey: 
+    iosRemoteConfigKey: 
+  appLovinAppOpen:
+    key: AppOpen
+    androidId: 
+    iosId: 
+    androidRemoteConfigKey: 
+    iosRemoteConfigKey: 
+  appLovinInterstitials:
+  - key: Inter_play_time
+    androidId: 
+    iosId: 
+    androidRemoteConfigKey: 
+    iosRemoteConfigKey: 
+  appLovinRewarded:
+  - key: Reward_Revive
+    androidId: 
+    iosId: 
+    androidRemoteConfigKey: 
+    iosRemoteConfigKey: 
+  initializeAdjust: 1
+  adjustAppToken: 
+  adjustEnvironment: 0
+  adjustLogLevel: 3
+  adjustSendInBackground: 1
+  adjustAdClickEventToken: 9s14t4
+  adjustAdRevenueEventToken: bmh2rl
+  adjustInterstitialFinishedEventToken: ukg1l5

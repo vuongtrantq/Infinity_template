@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "335804890121",
+    "project_id": "ig02-f00c6",
+    "storage_bucket": "ig02-f00c6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335804890121:android:a595413b4c28537820ccd8",
+        "android_client_info": {
+          "package_name": "com.game.angryheroes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9gzaemlEXEhsDGxPzJORgNBSGM5FtzeQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
