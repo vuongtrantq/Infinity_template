@@ -33,11 +33,12 @@ Unity integration package for partners: AdMob, AppLovin MAX, Adjust, Firebase An
 5. Add the Firebase UPM dependencies to `Packages/manifest.json` if they are not already present:
 
 ```json
-"com.google.external-dependency-manager": "https://dl.google.com/games/registry/unity/com.google.external-dependency-manager/com.google.external-dependency-manager-1.2.186.tgz",
-"com.google.firebase.app": "https://dl.google.com/games/registry/unity/com.google.firebase.app/com.google.firebase.app-13.13.0.tgz",
-"com.google.firebase.analytics": "https://dl.google.com/games/registry/unity/com.google.firebase.analytics/com.google.firebase.analytics-13.13.0.tgz",
-"com.google.firebase.crashlytics": "https://dl.google.com/games/registry/unity/com.google.firebase.crashlytics/com.google.firebase.crashlytics-13.13.0.tgz",
-"com.google.firebase.remote-config": "https://dl.google.com/games/registry/unity/com.google.firebase.remote-config/com.google.firebase.remote-config-13.13.0.tgz"
+    "com.google.firebase.app": "https://github.com/RageAgainstThePixel/com.google.firebase.app.git#13.13.0",
+    "com.google.firebase.analytics": "https://github.com/RageAgainstThePixel/com.google.firebase.analytics.git#13.13.0",
+    "com.google.firebase.crashlytics": "https://github.com/RageAgainstThePixel/com.google.firebase.crashlytics.git#13.13.0",
+    "com.google.firebase.remote-config": "https://github.com/RageAgainstThePixel/com.google.firebase.remote-config.git#13.13.0",
+or download
+  https://dl.google.com/firebase/sdk/unity/firebase_unity_sdk_13.13.0.zip?hl=vi
 ```
 
 6. Run `Assets > External Dependency Manager > Android Resolver > Resolve`.
