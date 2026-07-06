@@ -64,6 +64,11 @@ namespace PartnerIntegration
                 InitializeAds();
             }
 
+            if (settings.InitializeIap)
+            {
+                IapManager.Initialize(settings);
+            }
+
             IsInitialized = true;
         }
 
@@ -141,6 +146,21 @@ namespace PartnerIntegration
             }
 
             return adsProvider.ShowAppOpenIfAvailable();
+        }
+
+        public bool IsIapReady()
+        {
+            return IapManager.IsReady;
+        }
+
+        public void PurchaseIap(string key, Action<IapPurchaseResult> onComplete = null)
+        {
+            IapManager.Purchase(key, onComplete);
+        }
+
+        public void RestoreIapPurchases(Action<bool> onComplete = null)
+        {
+            IapManager.RestorePurchases(onComplete);
         }
 
         internal void NotifyRewardedLoaded()

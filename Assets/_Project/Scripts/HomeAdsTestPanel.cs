@@ -9,6 +9,7 @@ namespace Base.Home
     {
         [SerializeField] private string interstitialKey = "Inter_play_time";
         [SerializeField] private string rewardedKey = "Reward_Revive";
+        [SerializeField] private string iapProductKey = "remove_ads";
 
         private Text statusText;
 
@@ -102,6 +103,22 @@ namespace Base.Home
                 SetStatus("Adjust event requested");
             });
 
+            CreateButton(panel.transform, "Buy IAP", () =>
+            {
+                IntegrationBootstrap.Instance.PurchaseIap(iapProductKey, result =>
+                {
+                    SetStatus(result.Success ? "IAP purchased: " + result.Key : "IAP failed: " + result.Message);
+                });
+
+                SetStatus("IAP purchase requested");
+            });
+
+            CreateButton(panel.transform, "Restore IAP", () =>
+            {
+                IntegrationBootstrap.Instance.RestoreIapPurchases(success => SetStatus("IAP restore result: " + success));
+                SetStatus("IAP restore requested");
+            });
+
             statusText = CreateText(panel.transform, "Ready", 32, TextAnchor.MiddleCenter);
             var statusRect = statusText.GetComponent<RectTransform>();
             statusRect.sizeDelta = new Vector2(760f, 80f);
@@ -117,7 +134,7 @@ namespace Base.Home
             rect.anchorMax = new Vector2(0.5f, 0.5f);
             rect.pivot = new Vector2(0.5f, 0.5f);
             rect.anchoredPosition = Vector2.zero;
-            rect.sizeDelta = new Vector2(840f, 1040f);
+            rect.sizeDelta = new Vector2(840f, 1260f);
 
             var image = panel.GetComponent<Image>();
             image.color = new Color(0.05f, 0.09f, 0.13f, 0.88f);

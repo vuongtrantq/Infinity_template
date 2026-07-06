@@ -1,6 +1,6 @@
 # Integration Package
 
-Unity integration package for partners: AdMob, AppLovin MAX, Adjust, Firebase Analytics, Firebase Crashlytics, and Firebase Remote Config.
+Unity integration package for partners: AdMob, AppLovin MAX, Adjust, Unity IAP, Firebase Analytics, Firebase Crashlytics, and Firebase Remote Config.
 
 ## Included
 
@@ -12,6 +12,7 @@ Unity integration package for partners: AdMob, AppLovin MAX, Adjust, Firebase An
   - `com.google.firebase.crashlytics`
   - `com.google.firebase.remote-config`
 - Runtime wrapper in `Assets/IntegrationPackage/Runtime`.
+- Unity IAP package dependency: `com.unity.purchasing` `4.12.2`.
 - Editor exporter in `Tools/Integration Package/Export UnityPackage`.
 - Default bootstrap prefab generated at `Assets/IntegrationPackage/Prefabs/IntegrationBootstrap.prefab`.
 - Default settings generated at `Assets/IntegrationPackage/Resources/IntegrationPackage/IntegrationSettings.asset`.
@@ -40,8 +41,15 @@ Unity integration package for partners: AdMob, AppLovin MAX, Adjust, Firebase An
 "com.google.firebase.remote-config": "https://dl.google.com/games/registry/unity/com.google.firebase.remote-config/com.google.firebase.remote-config-13.13.0.tgz"
 ```
 
-6. Run `Assets > External Dependency Manager > Android Resolver > Resolve`.
-7. For Android build, use a writable Android SDK path or run Unity as administrator if the build prints `Probably the SDK is read-only`.
+6. Add Unity IAP if it is not already present:
+
+```json
+"com.unity.purchasing": "4.12.2"
+```
+
+7. Configure IAP product IDs in `IntegrationSettings.asset`.
+8. Run `Assets > External Dependency Manager > Android Resolver > Resolve`.
+9. For Android build, use a writable Android SDK path or run Unity as administrator if the build prints `Probably the SDK is read-only`.
 
 ## Firebase Android notes
 
@@ -58,10 +66,22 @@ IntegrationBootstrap.Instance.HideBanner();
 IntegrationBootstrap.Instance.ShowInterstitial("Inter_play_time", OnClosed, OnFailed);
 IntegrationBootstrap.Instance.ShowRewarded("Reward_Revive", success => { });
 IntegrationBootstrap.Instance.ShowAppOpenIfAvailable();
+IntegrationBootstrap.Instance.PurchaseIap("remove_ads", result => { });
+IntegrationBootstrap.Instance.RestoreIapPurchases(success => { });
 
 AnalyticsTracker.LogEvent("custom_event");
 AdjustTracker.TrackEvent("adjust_event_token");
 ```
+
+## IAP
+
+Configure products in `IntegrationSettings.asset`:
+
+- `key`: logical key used by game code, for example `remove_ads`.
+- `androidId`: Google Play product ID.
+- `iosId`: App Store product ID.
+- `type`: consumable, non-consumable, or subscription.
+- `adjustPurchaseEventToken`: optional Adjust event token for purchase revenue tracking.
 
 ## Remote Config keys
 

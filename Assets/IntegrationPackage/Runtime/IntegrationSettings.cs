@@ -73,6 +73,13 @@ namespace PartnerIntegration
         [SerializeField] private string adjustAdRevenueEventToken = "bmh2rl";
         [SerializeField] private string adjustInterstitialFinishedEventToken = "ukg1l5";
 
+        [Header("IAP")]
+        [SerializeField] private bool initializeIap = true;
+        [SerializeField] private List<IapProductDefinition> iapProducts = new List<IapProductDefinition>
+        {
+            new IapProductDefinition("remove_ads", "remove_ads", "remove_ads", IapProductType.NonConsumable, "")
+        };
+
         public bool AutoInitialize => autoInitialize;
         public bool InitializeFirebase => initializeFirebase;
         public bool InitializeAds => initializeAds;
@@ -106,6 +113,9 @@ namespace PartnerIntegration
         public string AdjustAdClickEventToken => adjustAdClickEventToken;
         public string AdjustAdRevenueEventToken => adjustAdRevenueEventToken;
         public string AdjustInterstitialFinishedEventToken => adjustInterstitialFinishedEventToken;
+
+        public bool InitializeIap => initializeIap;
+        public IReadOnlyList<IapProductDefinition> IapProducts => iapProducts;
 
         public static IntegrationSettings Load()
         {

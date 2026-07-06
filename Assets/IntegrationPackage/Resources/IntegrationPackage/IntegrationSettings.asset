@@ -81,3 +81,10 @@ MonoBehaviour:
   adjustAdClickEventToken: 9s14t4
   adjustAdRevenueEventToken: bmh2rl
   adjustInterstitialFinishedEventToken: ukg1l5
+  initializeIap: 1
+  iapProducts:
+  - key: remove_ads
+    androidId: remove_ads
+    iosId: remove_ads
+    type: 1
+    adjustPurchaseEventToken: 
