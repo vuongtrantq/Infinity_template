@@ -229,6 +229,10 @@ PrefabInstance:
       value: sa9erawjvev4
       objectReference: {fileID: 0}
     - target: {fileID: 114179903453641630, guid: a3267720e82aa41c1a05ab29824902b4, type: 3}
+      propertyPath: environment
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114179903453641630, guid: a3267720e82aa41c1a05ab29824902b4, type: 3}
       propertyPath: startManually
       value: 0
       objectReference: {fileID: 0}

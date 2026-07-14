@@ -16,9 +16,9 @@ MonoBehaviour:
   initializeFirebase: 1
   initializeAds: 1
   activeAdNetwork: 0
-  showAppOpen: 1
+  showAppOpen: 0
   bannerPosition: 0
-  interstitialIntervalSeconds: 40
+  interstitialIntervalSeconds: 1000
   fetchRemoteConfig: 1
   remoteConfigCacheSeconds: 0
   remoteUseAdMobKey: IS_ADMOB
@@ -26,7 +26,7 @@ MonoBehaviour:
   remoteInterstitialIntervalKey: INTERVAL_TIME
   admobBanner:
     key: Banner
-    androidId: ca-app-pub-3940256099942544/6300978111
+    androidId: ca-app-pub-6691965685689933/7223714700
     iosId: ca-app-pub-3940256099942544/2934735716
     androidRemoteConfigKey: ADMOB_ANDROID_BANNER_ID
     iosRemoteConfigKey: ADMOB_IOS_BANNER_ID
