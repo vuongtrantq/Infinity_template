@@ -73,7 +73,7 @@ MonoBehaviour:
     iosId: 
     androidRemoteConfigKey: 
     iosRemoteConfigKey: 
-  initializeAdjust: 1
+  initializeAdjust: 0
   adjustAppToken: 
   adjustEnvironment: 0
   adjustLogLevel: 3
