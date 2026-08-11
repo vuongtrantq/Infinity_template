@@ -7,13 +7,19 @@ namespace PartnerIntegration
     [DisallowMultipleComponent]
     public sealed class IntegrationBootstrap : MonoBehaviour
     {
+        private const float ExternalAdClickSuppressSeconds = 2f;
+        private const float ExternalAdClickResumeSuppressSeconds = 10f;
+
         public static IntegrationBootstrap Instance { get; private set; }
 
         [SerializeField] private IntegrationSettings settings;
 
         private IAdsProvider adsProvider;
         private bool initializeStarted;
+        private bool bannerVisibleRequested;
+        private bool pendingExternalAdClickResume;
         private float lastInterstitialShowTime = -9999f;
+        private float appOpenSuppressedUntil = -9999f;
 
         public IntegrationSettings Settings => settings;
         public bool IsInitialized { get; private set; }
@@ -79,15 +85,21 @@ namespace PartnerIntegration
                 : new AppLovinMaxAdsProvider(this, settings);
 
             adsProvider.Initialize();
+            if (bannerVisibleRequested)
+            {
+                adsProvider.ShowBanner();
+            }
         }
 
         public void ShowBanner()
         {
+            bannerVisibleRequested = true;
             adsProvider?.ShowBanner();
         }
 
         public void HideBanner()
         {
+            bannerVisibleRequested = false;
             adsProvider?.HideBanner();
         }
 
@@ -140,7 +152,7 @@ namespace PartnerIntegration
 
         public bool ShowAppOpenIfAvailable()
         {
-            if (adsProvider == null || !settings.ShowAppOpen || IsAdShowing)
+            if (adsProvider == null || !settings.ShowAppOpen || IsAdShowing || IsAppOpenSuppressed())
             {
                 return false;
             }
@@ -148,14 +160,40 @@ namespace PartnerIntegration
             return adsProvider.ShowAppOpenIfAvailable();
         }
 
+        public void SuppressAppOpenForSeconds(float seconds)
+        {
+            appOpenSuppressedUntil = Mathf.Max(appOpenSuppressedUntil, Time.realtimeSinceStartup + Mathf.Max(0f, seconds));
+        }
+
+        internal void NotifyExternalAdClick()
+        {
+            pendingExternalAdClickResume = true;
+            SuppressAppOpenForSeconds(ExternalAdClickSuppressSeconds);
+        }
+
+        private bool IsAppOpenSuppressed()
+        {
+            return Time.realtimeSinceStartup < appOpenSuppressedUntil;
+        }
+
         public bool IsIapReady()
         {
             return IapManager.IsReady;
         }
 
+        public bool TryGetIapLocalizedPrice(string key, out string price)
+        {
+            return IapManager.TryGetLocalizedPriceString(key, out price);
+        }
+
         public void PurchaseIap(string key, Action<IapPurchaseResult> onComplete = null)
         {
-            IapManager.Purchase(key, onComplete);
+            SuppressAppOpenForSeconds(300f);
+            IapManager.Purchase(key, result =>
+            {
+                SuppressAppOpenForSeconds(10f);
+                onComplete?.Invoke(result);
+            });
         }
 
         public void RestoreIapPurchases(Action<bool> onComplete = null)
@@ -175,10 +213,19 @@ namespace PartnerIntegration
 
         private void OnApplicationPause(bool pauseStatus)
         {
-            if (!pauseStatus)
+            if (pauseStatus)
             {
-                ShowAppOpenIfAvailable();
+                return;
             }
+
+            if (pendingExternalAdClickResume)
+            {
+                pendingExternalAdClickResume = false;
+                SuppressAppOpenForSeconds(ExternalAdClickResumeSuppressSeconds);
+                return;
+            }
+
+            ShowAppOpenIfAvailable();
         }
     }
 }

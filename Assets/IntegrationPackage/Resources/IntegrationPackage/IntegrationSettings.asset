@@ -16,9 +16,9 @@ MonoBehaviour:
   initializeFirebase: 1
   initializeAds: 1
   activeAdNetwork: 0
-  showAppOpen: 0
+  showAppOpen: 1
   bannerPosition: 0
-  interstitialIntervalSeconds: 1000
+  interstitialIntervalSeconds: 40
   fetchRemoteConfig: 1
   remoteConfigCacheSeconds: 0
   remoteUseAdMobKey: IS_ADMOB
@@ -26,65 +26,105 @@ MonoBehaviour:
   remoteInterstitialIntervalKey: INTERVAL_TIME
   admobBanner:
     key: Banner
-    androidId: ca-app-pub-6691965685689933/7223714700
+    androidId: ca-app-pub-7462273888693209/2374229506
     iosId: ca-app-pub-3940256099942544/2934735716
     androidRemoteConfigKey: ADMOB_ANDROID_BANNER_ID
     iosRemoteConfigKey: ADMOB_IOS_BANNER_ID
   admobAppOpen:
     key: AppOpen
-    androidId: ca-app-pub-3940256099942544/9257395921
+    androidId: ca-app-pub-7462273888693209/4034795532
     iosId: ca-app-pub-3940256099942544/5575463023
     androidRemoteConfigKey: ADMOB_ANDROID_APP_OPEN_ID
     iosRemoteConfigKey: ADMOB_IOS_APP_OPEN_ID
   admobInterstitials:
   - key: Inter_play_time
-    androidId: ca-app-pub-3940256099942544/1033173712
+    androidId: ca-app-pub-7462273888693209/3335158624
     iosId: ca-app-pub-3940256099942544/4411468910
     androidRemoteConfigKey: ADMOB_ANDROID_INTERTITIAL_ID
     iosRemoteConfigKey: ADMOB_IOS_INTERTITIAL_ID
   admobRewarded:
   - key: Reward_Revive
-    androidId: ca-app-pub-3940256099942544/5224354917
+    androidId: ca-app-pub-7462273888693209/1061147836
     iosId: ca-app-pub-3940256099942544/1712485313
     androidRemoteConfigKey: ADMOB_ANDROID_REWARDED_ID
     iosRemoteConfigKey: ADMOB_IOS_REWARDED_ID
-  appLovinSdkKey: 
+  appLovinSdkKey: Um2rsugKCoTO3BZ3WiVaPVfbhvKwEepRIJiNNG4_chMvrTCsZH4HaBNbxEmNswwTRa69uIxRZf7k3CCBl2fbTI
   appLovinBanner:
     key: Banner
-    androidId: 
+    androidId: baf3c2c8dcb420f3
     iosId: 
     androidRemoteConfigKey: 
     iosRemoteConfigKey: 
   appLovinAppOpen:
     key: AppOpen
-    androidId: 
+    androidId: 91b2fe63c6ad6390
     iosId: 
     androidRemoteConfigKey: 
     iosRemoteConfigKey: 
   appLovinInterstitials:
   - key: Inter_play_time
-    androidId: 
+    androidId: b18d1d1bb0a7c590
     iosId: 
     androidRemoteConfigKey: 
     iosRemoteConfigKey: 
   appLovinRewarded:
   - key: Reward_Revive
-    androidId: 
+    androidId: 15e93a9ffea9da
     iosId: 
     androidRemoteConfigKey: 
     iosRemoteConfigKey: 
   initializeAdjust: 0
-  adjustAppToken: 
-  adjustEnvironment: 0
+  adjustAppToken: stc7eyk1xce8
+  adjustEnvironment: 1
   adjustLogLevel: 3
   adjustSendInBackground: 1
   adjustAdClickEventToken: 9s14t4
-  adjustAdRevenueEventToken: bmh2rl
+  adjustAdRevenueEventToken: 
   adjustInterstitialFinishedEventToken: ukg1l5
   initializeIap: 1
   iapProducts:
-  - key: remove_ads
-    androidId: remove_ads
-    iosId: remove_ads
+  - key: ig17_noads
+    androidId: ig17_noads
+    iosId: ig17_noads
     type: 1
-    adjustPurchaseEventToken: 
+    adjustPurchaseEventToken: 645g9e
+  - key: ig17_noads_bundle_allvehicles
+    androidId: ig17_noads_bundle_allvehicles
+    iosId: ig17_noads_bundle_allvehicles
+    type: 1
+    adjustPurchaseEventToken: 645g9e
+  - key: ig17_noads_bundle_allbike
+    androidId: ig17_noads_bundle_allbike
+    iosId: ig17_noads_bundle_allbike
+    type: 1
+    adjustPurchaseEventToken: 645g9e
+  - key: ig17_noads_bundle_fullgame
+    androidId: ig17_noads_bundle_fullgame
+    iosId: ig17_noads_bundle_fullgame
+    type: 1
+    adjustPurchaseEventToken: 645g9e
+  - key: ig17_cash01
+    androidId: ig17_cash01
+    iosId: ig17_cash01
+    type: 0
+    adjustPurchaseEventToken: 645g9e
+  - key: ig17_cash02
+    androidId: ig17_cash02
+    iosId: ig17_cash02
+    type: 0
+    adjustPurchaseEventToken: 645g9e
+  - key: ig17_cash03
+    androidId: ig17_cash03
+    iosId: ig17_cash03
+    type: 0
+    adjustPurchaseEventToken: 645g9e
+  - key: ig17_cash04
+    androidId: ig17_cash04
+    iosId: ig17_cash04
+    type: 0
+    adjustPurchaseEventToken: 645g9e
+  - key: ig17_cash05
+    androidId: ig17_cash05
+    iosId: ig17_cash05
+    type: 0
+    adjustPurchaseEventToken: 645g9e

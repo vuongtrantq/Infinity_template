@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using AdjustSdk;
+using DG.Tweening;
 using GoogleMobileAds.Api;
 using UnityEngine;
 
@@ -29,6 +30,7 @@ namespace PartnerIntegration.Ads
         private AppOpenAd appOpenAd;
         private DateTime appOpenLoadTime;
         private bool appOpenShowing;
+        private bool bannerVisibleRequested;
 
         public AdMobAdsProvider(IntegrationBootstrap owner, IntegrationSettings settings)
         {
@@ -58,11 +60,21 @@ namespace PartnerIntegration.Ads
 
         public void ShowBanner()
         {
-            bannerView?.Show();
+            bannerVisibleRequested = true;
+            if (bannerView == null)
+            {
+                if (IsInitialized)
+                {
+                    CreateBanner();
+                }
+                return;
+            }
+            bannerView.Show();
         }
 
         public void HideBanner()
         {
+            bannerVisibleRequested = false;
             bannerView?.Hide();
         }
 
@@ -220,11 +232,22 @@ namespace PartnerIntegration.Ads
 
             var position = settings.BannerPosition == IntegrationBannerPosition.Top ? AdPosition.Top : AdPosition.Bottom;
             bannerView = new BannerView(settings.AdMobBanner.CurrentId, AdSize.Banner, position);
-            bannerView.OnBannerAdLoaded += () => Debug.Log("[IntegrationPackage] AdMob banner loaded");
+            bannerView.OnBannerAdLoaded += () =>
+            {
+                Debug.Log("[IntegrationPackage] AdMob banner loaded");
+                if (bannerVisibleRequested)
+                {
+                    bannerView.Show();
+                }
+            };
             bannerView.OnBannerAdLoadFailed += error => Debug.LogWarning("[IntegrationPackage] AdMob banner failed: " + error);
+            bannerView.OnAdClicked += owner.NotifyExternalAdClick;
             bannerView.OnAdPaid += value => HandleAdPaid(value, settings.AdMobBanner.CurrentId, "banner");
             bannerView.LoadAd(new AdRequest());
-            bannerView.Hide();
+            if (!bannerVisibleRequested)
+            {
+                bannerView.Hide();
+            }
         }
 
         private void LoadInterstitials()
@@ -250,7 +273,7 @@ namespace PartnerIntegration.Ads
                 {
                     interstitialLoaded[key] = false;
                     Debug.LogWarning("[IntegrationPackage] AdMob interstitial load failed: " + error);
-                    owner.StartCoroutine(RetryAfterDelay(() => LoadInterstitial(key), 5f));
+                    owner.StartCoroutine(RetryAfterDelay(() => LoadInterstitial(key), 20f));
                     return;
                 }
 
@@ -269,7 +292,7 @@ namespace PartnerIntegration.Ads
         {
             ad.OnAdFullScreenContentClosed += () =>
             {
-                owner.IsAdShowing = false;
+                ClearAdShowingAfterDelay();
                 AdjustTracker.TrackConfiguredInterstitialFinished();
                 AnalyticsTracker.LogInterWatched();
 
@@ -283,7 +306,7 @@ namespace PartnerIntegration.Ads
 
             ad.OnAdFullScreenContentFailed += error =>
             {
-                owner.IsAdShowing = false;
+                ClearAdShowingAfterDelay();
                 Debug.LogWarning("[IntegrationPackage] AdMob interstitial display failed: " + error);
 
                 if (interstitialFailedCallbacks.TryGetValue(key, out var callback))
@@ -321,7 +344,7 @@ namespace PartnerIntegration.Ads
                 {
                     rewardedLoaded[key] = false;
                     Debug.LogWarning("[IntegrationPackage] AdMob rewarded load failed: " + error);
-                    owner.StartCoroutine(RetryAfterDelay(() => LoadRewarded(key), 5f));
+                    owner.StartCoroutine(RetryAfterDelay(() => LoadRewarded(key), 20f));
                     return;
                 }
 
@@ -341,7 +364,7 @@ namespace PartnerIntegration.Ads
         {
             ad.OnAdFullScreenContentClosed += () =>
             {
-                owner.IsAdShowing = false;
+                ClearAdShowingAfterDelay();
                 var earned = rewardedEarned.ContainsKey(key) && rewardedEarned[key];
 
                 if (earned)
@@ -359,7 +382,7 @@ namespace PartnerIntegration.Ads
 
             ad.OnAdFullScreenContentFailed += error =>
             {
-                owner.IsAdShowing = false;
+                ClearAdShowingAfterDelay();
                 Debug.LogWarning("[IntegrationPackage] AdMob rewarded display failed: " + error);
 
                 if (rewardedCallbacks.TryGetValue(key, out var callback))
@@ -410,13 +433,21 @@ namespace PartnerIntegration.Ads
                 && DateTime.UtcNow - appOpenLoadTime < TimeSpan.FromHours(AppOpenExpireHours);
         }
 
+        private void ClearAdShowingAfterDelay()
+        {
+            DOTween.Sequence().SetDelay(.5f).OnComplete(() =>
+            {
+                owner.IsAdShowing = false;
+            });
+        }
+
         private void HandleAdPaid(AdValue adValue, string adUnitId, string placement)
         {
             var revenue = adValue.Value / 1000000d;
             var currency = string.IsNullOrWhiteSpace(adValue.CurrencyCode) ? "USD" : adValue.CurrencyCode;
 
             AdjustTracker.TrackAdRevenue(AdjustConfig.AdjustAdRevenueSourceAdMob, revenue, currency, "admob", adUnitId, placement);
-            AnalyticsTracker.LogAdMobPaidImpression(revenue, currency, adUnitId, placement);
+            AnalyticsTracker.LogAdMobPaidImpression(revenue, adValue.Value, (int)adValue.Precision, currency, adUnitId, placement);
         }
 
         private static IEnumerator RetryAfterDelay(Action action, float delay)

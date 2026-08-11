@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AdjustSdk;
+using DG.Tweening;
 using UnityEngine;
 
 namespace PartnerIntegration.Ads
@@ -22,6 +23,7 @@ namespace PartnerIntegration.Ads
         private readonly Dictionary<string, bool> rewardedEarned = new Dictionary<string, bool>();
 
         private bool callbacksRegistered;
+        private bool bannerVisibleRequested;
 
         public AppLovinMaxAdsProvider(IntegrationBootstrap owner, IntegrationSettings settings)
         {
@@ -51,6 +53,10 @@ namespace PartnerIntegration.Ads
             {
                 IsInitialized = true;
                 InitializeBanner();
+                if (bannerVisibleRequested)
+                {
+                    ShowBanner();
+                }
                 LoadInterstitials();
                 LoadRewardedAds();
                 LoadAppOpen();
@@ -62,6 +68,7 @@ namespace PartnerIntegration.Ads
 
         public void ShowBanner()
         {
+            bannerVisibleRequested = true;
             if (settings.AppLovinBanner.HasCurrentId)
             {
                 MaxSdk.ShowBanner(settings.AppLovinBanner.CurrentId);
@@ -70,6 +77,7 @@ namespace PartnerIntegration.Ads
 
         public void HideBanner()
         {
+            bannerVisibleRequested = false;
             if (settings.AppLovinBanner.HasCurrentId)
             {
                 MaxSdk.HideBanner(settings.AppLovinBanner.CurrentId);
@@ -192,6 +200,7 @@ namespace PartnerIntegration.Ads
             MaxSdkCallbacks.Rewarded.OnAdReceivedRewardEvent += OnRewardedReceivedReward;
             MaxSdkCallbacks.Rewarded.OnAdRevenuePaidEvent += OnAdRevenuePaid;
 
+            MaxSdkCallbacks.Banner.OnAdClickedEvent += OnBannerClicked;
             MaxSdkCallbacks.Banner.OnAdRevenuePaidEvent += OnAdRevenuePaid;
             MaxSdkCallbacks.AppOpen.OnAdHiddenEvent += OnAppOpenHidden;
             MaxSdkCallbacks.AppOpen.OnAdDisplayFailedEvent += OnAppOpenDisplayFailed;
@@ -242,7 +251,7 @@ namespace PartnerIntegration.Ads
 
         private void OnInterstitialDisplayFailed(string adUnitId, MaxSdkBase.ErrorInfo errorInfo, MaxSdkBase.AdInfo adInfo)
         {
-            owner.IsAdShowing = false;
+            ClearAdShowingAfterDelay();
 
             if (interstitialFailedCallbacks.TryGetValue(adUnitId, out var callback))
             {
@@ -254,7 +263,7 @@ namespace PartnerIntegration.Ads
 
         private void OnInterstitialHidden(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
-            owner.IsAdShowing = false;
+            ClearAdShowingAfterDelay();
             AdjustTracker.TrackConfiguredInterstitialFinished();
             AnalyticsTracker.LogInterWatched();
 
@@ -296,7 +305,7 @@ namespace PartnerIntegration.Ads
 
         private void OnRewardedDisplayFailed(string adUnitId, MaxSdkBase.ErrorInfo errorInfo, MaxSdkBase.AdInfo adInfo)
         {
-            owner.IsAdShowing = false;
+            ClearAdShowingAfterDelay();
 
             if (rewardedCallbacks.TryGetValue(adUnitId, out var callback))
             {
@@ -313,7 +322,7 @@ namespace PartnerIntegration.Ads
 
         private void OnRewardedHidden(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
-            owner.IsAdShowing = false;
+            ClearAdShowingAfterDelay();
             var earned = rewardedEarned.ContainsKey(adUnitId) && rewardedEarned[adUnitId];
 
             if (earned)
@@ -342,11 +351,17 @@ namespace PartnerIntegration.Ads
             MaxSdk.LoadAppOpenAd(adUnitId);
         }
 
+        private void OnBannerClicked(string adUnitId, MaxSdkBase.AdInfo adInfo)
+        {
+            owner.NotifyExternalAdClick();
+        }
+
         private void OnAdRevenuePaid(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
             var revenue = adInfo.Revenue;
             var network = adInfo.NetworkName;
             var placement = string.IsNullOrWhiteSpace(adInfo.Placement) ? adUnitId : adInfo.Placement;
+            var adFormat = ResolveAdFormat(adUnitId);
 
             AdjustTracker.TrackAdRevenue(
                 AdjustConfig.AdjustAdRevenueSourceAppLovinMAX,
@@ -356,7 +371,36 @@ namespace PartnerIntegration.Ads
                 adInfo.AdUnitIdentifier,
                 placement);
 
-            AnalyticsTracker.LogMaxPaidImpression(revenue, "USD", network, adInfo.AdUnitIdentifier, placement);
+            AnalyticsTracker.LogMaxPaidImpression(adFormat, revenue, "USD", network, adInfo.AdUnitIdentifier, placement);
+        }
+
+        private void ClearAdShowingAfterDelay()
+        {
+            DOTween.Sequence().SetDelay(.5f).OnComplete(() =>
+            {
+                owner.IsAdShowing = false;
+            });
+        }
+
+        private string ResolveAdFormat(string adUnitId)
+        {
+            if (settings.AppLovinBanner.HasCurrentId && settings.AppLovinBanner.CurrentId == adUnitId)
+            {
+                return "banner";
+            }
+            if (settings.AppLovinAppOpen.HasCurrentId && settings.AppLovinAppOpen.CurrentId == adUnitId)
+            {
+                return "app_open";
+            }
+            if (interstitialKeyByAdUnit.ContainsKey(adUnitId))
+            {
+                return "interstitial";
+            }
+            if (rewardedKeyByAdUnit.ContainsKey(adUnitId))
+            {
+                return "video_rewarded";
+            }
+            return string.Empty;
         }
 
         private static int NextRetryAttempt(Dictionary<string, int> retries, string adUnitId)

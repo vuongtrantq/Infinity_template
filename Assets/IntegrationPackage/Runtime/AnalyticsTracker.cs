@@ -13,6 +13,7 @@ namespace PartnerIntegration
         public const string AdInterstitialRequest = "ad_interstital_request";
         public const string PaidAdImpression = "paid_ad_impression";
         public const string AdImpression = "ad_impression";
+        public const string AdImpressionMax = "ad_impression_max";
 
         public static void LogEvent(string eventName)
         {
@@ -44,24 +45,34 @@ namespace PartnerIntegration
             TryLog(() => FirebaseAnalytics.LogEvent(eventName, parameters));
         }
 
-        public static void LogAdMobPaidImpression(double value, string currency, string adUnitId, string placement)
+        public static void LogAdMobPaidImpression(double value, long valueMicros, int precision, string currency, string adUnitId, string placement)
         {
             LogEvent(PaidAdImpression,
                 new Parameter("ad_platform", "AdMob"),
                 new Parameter("ad_source", "admob"),
                 new Parameter("ad_unit_name", adUnitId ?? string.Empty),
+                new Parameter("adunitid", adUnitId ?? string.Empty),
                 new Parameter("ad_placement", placement ?? string.Empty),
+                new Parameter("ad_format", placement ?? string.Empty),
+                new Parameter("valuemicros", valueMicros),
+                new Parameter("precision", precision),
                 new Parameter("value", value),
+                new Parameter("adValue", value + (string.IsNullOrWhiteSpace(currency) ? "USD" : currency)),
                 new Parameter("currency", string.IsNullOrWhiteSpace(currency) ? "USD" : currency));
         }
 
-        public static void LogMaxPaidImpression(double value, string currency, string network, string adUnitId, string placement)
+        public static void LogMaxPaidImpression(string adFormat, double value, string currency, string network, string adUnitId, string placement)
         {
-            LogEvent(AdImpression,
+            LogEvent(AdImpressionMax,
+                new Parameter("ad_format", adFormat ?? string.Empty),
                 new Parameter("ad_platform", "AppLovin MAX"),
+                new Parameter("ad_network", network ?? string.Empty),
                 new Parameter("ad_source", network ?? string.Empty),
+                new Parameter("ad_unit_id", adUnitId ?? string.Empty),
                 new Parameter("ad_unit_name", adUnitId ?? string.Empty),
+                new Parameter("placement", placement ?? string.Empty),
                 new Parameter("ad_placement", placement ?? string.Empty),
+                new Parameter("is_show", 1),
                 new Parameter("value", value),
                 new Parameter("currency", string.IsNullOrWhiteSpace(currency) ? "USD" : currency));
         }

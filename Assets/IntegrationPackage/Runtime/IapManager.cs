@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-#if UNITY_PURCHASING
 using UnityEngine.Purchasing;
-#endif
+using UnityEngine.Purchasing.Extension;
 
 namespace PartnerIntegration
 {
@@ -15,22 +13,15 @@ namespace PartnerIntegration
         private static readonly Dictionary<string, IapProductDefinition> ProductsByStoreId = new Dictionary<string, IapProductDefinition>();
         private static readonly Dictionary<string, Action<IapPurchaseResult>> PendingPurchases = new Dictionary<string, Action<IapPurchaseResult>>();
 
-#if UNITY_PURCHASING
         private static IStoreController controller;
         private static IExtensionProvider extensions;
-#endif
 
         public static bool IsReady
         {
-            get
-            {
-#if UNITY_PURCHASING
-                return controller != null && extensions != null;
-#else
-                return false;
-#endif
-            }
+            get { return controller != null && extensions != null; }
         }
+
+        public static event Action Initialized;
 
         public static void Initialize(IntegrationSettings integrationSettings)
         {
@@ -63,7 +54,6 @@ namespace PartnerIntegration
                 return;
             }
 
-#if UNITY_PURCHASING
             if (controller != null)
             {
                 return;
@@ -76,9 +66,6 @@ namespace PartnerIntegration
             }
 
             UnityPurchasing.Initialize(new StoreListener(), builder);
-#else
-            Debug.LogWarning("[IntegrationPackage] IAP package is not resolved yet. Add com.unity.purchasing and let Unity refresh packages.");
-#endif
         }
 
         public static void Purchase(string key, Action<IapPurchaseResult> onComplete = null)
@@ -95,7 +82,6 @@ namespace PartnerIntegration
                 return;
             }
 
-#if UNITY_PURCHASING
             if (!IsReady)
             {
                 onComplete?.Invoke(Fail(key, productDefinition.StoreId, "IAP is not initialized."));
@@ -111,14 +97,11 @@ namespace PartnerIntegration
 
             PendingPurchases[productDefinition.StoreId] = onComplete;
             controller.InitiatePurchase(product);
-#else
-            onComplete?.Invoke(Fail(key, productDefinition.StoreId, "Unity IAP package is not available."));
-#endif
         }
 
         public static void RestorePurchases(Action<bool> onComplete = null)
         {
-#if UNITY_PURCHASING && (UNITY_IOS || UNITY_TVOS || UNITY_STANDALONE_OSX)
+#if UNITY_IOS || UNITY_TVOS || UNITY_STANDALONE_OSX
             if (!IsReady)
             {
                 onComplete?.Invoke(false);
@@ -136,13 +119,35 @@ namespace PartnerIntegration
 #endif
         }
 
+        public static bool TryGetLocalizedPriceString(string key, out string price)
+        {
+            price = string.Empty;
+            if (string.IsNullOrWhiteSpace(key) || !ProductsByKey.TryGetValue(key, out var productDefinition))
+            {
+                return false;
+            }
+
+            if (!IsReady)
+            {
+                return false;
+            }
+
+            var product = controller.products.WithID(productDefinition.StoreId);
+            if (product == null || product.metadata == null || string.IsNullOrWhiteSpace(product.metadata.localizedPriceString))
+            {
+                return false;
+            }
+
+            price = product.metadata.localizedPriceString;
+            return true;
+        }
+
         private static IapPurchaseResult Fail(string key, string productId, string message)
         {
             Debug.LogWarning("[IntegrationPackage] IAP failed: " + message);
             return new IapPurchaseResult(false, key, productId, string.Empty, string.Empty, message);
         }
 
-#if UNITY_PURCHASING
         private static ProductType ConvertProductType(IapProductType type)
         {
             switch (type)
@@ -163,6 +168,7 @@ namespace PartnerIntegration
                 controller = storeController;
                 extensions = extensionProvider;
                 Debug.Log("[IntegrationPackage] IAP initialized.");
+                Initialized?.Invoke();
             }
 
             public void OnInitializeFailed(InitializationFailureReason error)
@@ -231,6 +237,5 @@ namespace PartnerIntegration
                 AdjustTracker.TrackPurchase(definition.AdjustPurchaseEventToken, revenue, currency, product.transactionID);
             }
         }
-#endif
     }
 }
