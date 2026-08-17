@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 using AdjustSdk;
-using DG.Tweening;
 using GoogleMobileAds.Api;
 using UnityEngine;
 
@@ -435,10 +433,7 @@ namespace PartnerIntegration.Ads
 
         private void ClearAdShowingAfterDelay()
         {
-            DOTween.Sequence().SetDelay(.5f).OnComplete(() =>
-            {
-                owner.IsAdShowing = false;
-            });
+            owner.StartCoroutine(RetryAfterDelay(() => owner.IsAdShowing = false, .5f));
         }
 
         private void HandleAdPaid(AdValue adValue, string adUnitId, string placement)

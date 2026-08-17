@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AdjustSdk;
-using DG.Tweening;
 using UnityEngine;
 
 namespace PartnerIntegration.Ads
@@ -376,10 +375,7 @@ namespace PartnerIntegration.Ads
 
         private void ClearAdShowingAfterDelay()
         {
-            DOTween.Sequence().SetDelay(.5f).OnComplete(() =>
-            {
-                owner.IsAdShowing = false;
-            });
+            owner.StartCoroutine(RetryAfterDelay(() => owner.IsAdShowing = false, .5f));
         }
 
         private string ResolveAdFormat(string adUnitId)
